@@ -11,7 +11,7 @@ mod tests {
     //
     // ### Booleans
     #[test]
-    fn booleans() {
+    fn test_booleans() {
         assert_eq!(true, !false);
         assert_eq!(false, !true);
         let t : bool = true;
@@ -23,7 +23,7 @@ mod tests {
     // ### Integers
     //
     #[test]
-    fn unsigned_integers() {
+    fn test_unsigned_integers() {
         assert_eq!(u8::MIN, 0);
         assert_eq!(u8::MAX, 255);
         assert_eq!(u16::MIN, 0);
@@ -38,7 +38,7 @@ mod tests {
         assert_eq!(u128::MAX, 340282366920938463463374607431768211455);
     }
     #[test]
-    fn signed_integers() {
+    fn test_signed_integers() {
         assert_eq!(i8::MIN, -128);
         assert_eq!(i8::MAX, 127);
         assert_eq!(i16::MIN, -32768);
@@ -54,14 +54,14 @@ mod tests {
     }
 
     #[test]
-    fn integer_literals() {
+    fn test_integer_literals() {
         assert_eq!(2500, 2_500);
         assert_eq!(255, 0xff);
         assert_eq!(255, 0b11111111);
         assert_eq!(65, b'A');
     }
     #[test]
-    fn integer_operators(){
+    fn test_integer_operators(){
         assert_eq!(3 + 2, 5);
         assert_eq!(3 - 2, 1);
         assert_eq!(3 * 2, 6);
@@ -70,7 +70,7 @@ mod tests {
         assert_eq!((2 as u32).pow(3), 8);
     }
     #[test]
-    fn integer_wrapping() {
+    fn test_integer_wrapping() {
         let mut a : u8 = 255;
         /* a += 1; panics */
         a = a.wrapping_add(1);
@@ -80,14 +80,14 @@ mod tests {
     // ### Floats
     //
     #[test]
-    fn floats() {
+    fn test_floats() {
         assert_eq!(f32::MIN, -3.4028235e38);
         assert_eq!(f32::MAX, 3.4028235e38);
         assert_eq!(f64::MIN, -1.7976931348623157e308);
         assert_eq!(f64::MAX, 1.7976931348623157e308);   
     }
     #[test]
-    fn float_operators(){
+    fn test_float_operators(){
         assert_eq!(0.7 + 0.3, 1.0);
         assert_eq!(1.5 - 0.5, 1.0);
         assert_eq!(2.5 * 3.0, 7.5);
@@ -98,7 +98,7 @@ mod tests {
     // ### Characters
     //
     #[test]
-    fn characters() {
+    fn test_characters() {
         let c1 = 'A';
         let c2: char = 'A';
         assert_eq!(c1, c2);
@@ -117,7 +117,7 @@ mod tests {
     // may be of a different type
     //
     #[test]
-    fn tuples() {
+    fn test_tuples() {
         let t : (u8, char, bool) = (255,'A',true);
         assert_eq!(t.0, 255);
         assert_eq!(t.1, 'A');
@@ -138,10 +138,11 @@ mod tests {
     // have the same type
     //
     #[test]
-    fn arrays() {
+    fn test_arrays() {
         let a = [1,2,3];
         let a_typed : [i32; 3] = [1,2,3];
         assert_eq!(a, a_typed);
+        assert_eq!(a.len(), 3);
         assert_eq!(a[0], 1);
         assert_eq!(a[1], 2);
         assert_eq!(a[2], 3);
@@ -150,6 +151,68 @@ mod tests {
         assert_eq!(a_repeat, [0,0,0,0,0]);
 
     }
+    //
+    // ## Variables
+    //
 
-
+    //
+    // ### Immutable and Mutable Variables
+    //
+    #[test]
+    fn test_variables() {
+        let _a : u8 = 9;
+        /* _a += 1; won't compile, variable is immutable */
+        let mut b : u8 = 9;
+        b += 1;
+        assert_eq!(b, 10)
+    }
+    //
+    // ### Constants
+    //
+    // They are inlined whenever they are evaluated
+    //
+    #[test]
+    fn test_constants() {
+        const MILLENNIUM_BUG : u16 = 2000;
+        assert_eq!(MILLENNIUM_BUG, 2000);
+    }
+    //
+    // ### Static variables
+    //
+    // They are stored in a fixed memory location and
+    // referenced accordingly whenever evaluated.
+    //
+    static BEST_COMMODORE_COMPUTER : u8 = 64;
+    static mut INITIAL_TEMPERATURE : i8 = -5;
+    #[test]
+    fn test_static_variables() {
+        assert_eq!(BEST_COMMODORE_COMPUTER, 64);
+        /* Use Mutex mechanism or similar to be safe */
+        unsafe {
+            INITIAL_TEMPERATURE += 7;
+            assert_eq!(INITIAL_TEMPERATURE, 2);
+        }
+    }
+    //
+    // ### Variable Scope
+    //
+    #[test]
+    fn test_variable_scope_1() {
+        let x = 1;
+        assert_eq!(x, 1);
+        {
+            /* This is a different x */
+            let x = 2;
+            assert_eq!(x, 2);
+        }
+        /* This is the original x */
+        assert_eq!(x, 1);
+    }
+    #[test]
+    fn test_variable_scope_2() {
+        let asterisks = ['*';5];
+        /* The asterisks variable replaces the old one above */
+        let asterisks = asterisks.len();
+        assert_eq!(asterisks,5);
+    }
 }
