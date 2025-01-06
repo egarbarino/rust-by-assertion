@@ -5,6 +5,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
 
+    //
     // ## Scalar Types
     //
     // Scalar type represents a single value. 
