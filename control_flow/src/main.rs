@@ -1,14 +1,11 @@
 fn main() {
   
 }
+//
+// ## Control Flow
+//
 #[cfg(test)]
 mod tests {
-    //
-    // ## Control Flow
-    //
-
-    use core::num;
-
     //
     // ### If-Then-Else
     //
