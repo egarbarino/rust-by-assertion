@@ -1,0 +1,12 @@
+[package]
+name = "main"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "rust2md"
+path = "src/main.rs"
+
+[dependencies]
+
+
