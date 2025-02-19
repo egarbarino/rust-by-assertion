@@ -6,7 +6,7 @@ fn main() {
 mod tests {
 
     //
-    // # Data Types
+    // # Simple Data Types
     //
     // ## Scalar Types
     //
@@ -14,7 +14,7 @@ mod tests {
     //
     // ### Booleans
     //
-    // Booleans use the `true` and `false` literals and can be reversed
+    // Booleans use the `true` and `false` literals and can be negated
     // using `!`.
     //
     #[test]
@@ -36,6 +36,8 @@ mod tests {
     // that is valid for addressing purposes. In contemporary computers,
     // this is equivalent to `u64`.
     //
+    // Let's look first at unsigned integers...
+    //
     #[test]
     fn test_unsigned_integers() {
         assert_eq!(u8::MIN, 0);
@@ -51,6 +53,9 @@ mod tests {
         assert_eq!(u128::MIN, 0);
         assert_eq!(u128::MAX, 340282366920938463463374607431768211455);
     }
+    //
+    // ... and now at signed ones:
+    //
     #[test]
     fn test_signed_integers() {
         assert_eq!(i8::MIN, -128);
@@ -78,7 +83,7 @@ mod tests {
     }
     //
     // Regular operators are implemented as in most languages,
-    // except for power.
+    // except for power which requires the `pow()` method.
     //
     #[test]
     fn test_integer_operators(){
@@ -115,7 +120,7 @@ mod tests {
     }
     //
     // Operators behave like in most conventional languages,
-    // except for power which requires the `powf` function.
+    // except for power which requires the `powf()` method.
     //
     #[test]
     fn test_float_operators(){
@@ -212,7 +217,7 @@ mod tests {
     // ## Slices
     //
     // A slice in Rust, similarly to Go, acts as a 'view' upon an array. Such
-    // a view consists of a start and end indices. A slice, as the name suggests,
+    // a view consists of start and end indices. A slice, as the name suggests,
     // allow manipulating subsets of an array without the need of having to
     // allocate a new one. 
     //
@@ -246,7 +251,7 @@ mod tests {
     }
     //
     // Note that the input is a fixed-size array but the output
-    // is a size-independent slice 
+    // is a size-independent slice.
     //
     fn return_array_slice(a : &[u8 ; 5]) -> &[u8] {
         &a[0..3]
@@ -254,7 +259,7 @@ mod tests {
     //
     // ### String slices
     //
-    // There isn't much special about string aliases, except
+    // There isn't nothing special about string slices, except
     // that the string slice type is `&str` rather than `&String`
     //
     #[test]
@@ -321,21 +326,36 @@ mod tests {
     // Static variables are stored in a fixed memory location and
     // referenced accordingly whenever evaluated.
     //
+    // Let's first declare two static variables, one mutable and the other one immutable...
+    //
     static BEST_COMMODORE_COMPUTER : u8 = 64;
 
     /* Unsafe; avoid this if possible */
     static mut INITIAL_TEMPERATURE : i8 = -5;
-    
+    //
+    // First, we see that they are in scope from within a test function.
+    //
     #[test]
     fn test_static_variables() {
         assert_eq!(BEST_COMMODORE_COMPUTER, 64);
        
-        /* Use Mutex mechanism or similar to be safe */
+        /* Don't do this! Use Mutex or similar to be safe */
         unsafe {
             INITIAL_TEMPERATURE += 7;
             assert_eq!(INITIAL_TEMPERATURE, 2);
         }
     }
+    //
+    // We can also prove that `BEST_COMMODORE_COMPUTER` is stored in the same memory location.
+    //
+    #[test]
+    fn test_static_variables_reference() {
+        let pointer_1 = std::ptr::addr_of!(BEST_COMMODORE_COMPUTER);
+        let pointer_2 = std::ptr::addr_of!(BEST_COMMODORE_COMPUTER);
+        assert_eq!(pointer_1,pointer_2)
+    }
+ 
+ 
     //
     // ## Variable Scope
     //
@@ -363,5 +383,154 @@ mod tests {
         let asterisks = ['*';5];         /* Here asterisks is an array */
         let asterisks = asterisks.len(); /* Here asterisks is an integer */
         assert_eq!(asterisks,5);
+    }
+    //
+    // # Structs
+    //
+    //
+    // ## Struct Definition
+    //
+    // Structs consists of one or more components using the `attribute : type` notation. 
+    // The last component may or may not include a comma.
+    //
+    struct Spaceship {
+        shield: bool,
+        name: String,
+        fuel: u8, /* Comma is optional */
+    }
+    //
+    // ## Regular Struct Construction and Query
+    //
+    // Structs are constructed using the same `attribute : value` notation.
+    // The last component may or may not include a comma. Components may
+    // be queried using the `struct_value.component_name` notation.
+    //
+
+    #[test]
+    fn test_struct() {
+        let spaceship = Spaceship {
+            shield: true,
+            name: String::from("Rocinante"),
+            fuel : 12, /* Comma is optional */
+        };
+        assert_eq!(spaceship.shield, true);
+        assert_eq!(spaceship.name, "Rocinante");
+        assert_eq!(spaceship.fuel, 12);
+    }
+    //
+    // ## Name-matching Struct Construction
+    //
+    // If the variable names match the struct's component
+    // names, there's no need to specify each component.
+    //
+    #[test]
+    fn test_struct_name() {
+        let shield = true;
+        let name = String::from("Rocinante");
+        let fuel : u8 = 12;
+        let spaceship = Spaceship {
+            shield, /* has to match struct's attribute name exactly */
+            name,   /* has to match struct's attribute name exactly */
+            fuel    /* has to match struct's attribute name exactly */
+        };
+        assert_eq!(spaceship.shield, true);
+        assert_eq!(spaceship.name, "Rocinante");
+        assert_eq!(spaceship.fuel, 12);
+    }
+    //
+    // ## Updating Mutable Struct
+    //
+    // In this case, each attribute must be updated separately
+    //
+    #[test]
+    fn test_struct_update_mutable() {
+        let mut spaceship = Spaceship {
+            shield: true,
+            name: String::from("Rocinante"),
+            fuel : 12
+        };
+        assert_eq!(spaceship.name, "Rocinante");
+        spaceship.name =  String::from("The Anubis"); /* Update here! */
+        assert_eq!(spaceship.name, "The Anubis");
+    }    
+    //
+    // ## Updating Immutable Struct
+    //
+    // This essentially involves creating a new struct value
+    // based on the value from an existing one, specifying it as
+    // the last component using the `..base_struct` notation.
+    //
+    #[test]
+    fn test_struct_update_immutable() {
+        let spaceship1 = Spaceship {
+            shield: true,
+            name: String::from("Rocinante"),
+            fuel : 12
+        };
+        let spaceship2 = Spaceship {
+            name: String::from("The Anubis"),
+            ..spaceship1 /* Note the reference to the previous struct here */
+        };
+
+        assert_eq!(spaceship1.shield, true);
+        assert_eq!(spaceship1.name, "Rocinante");
+        assert_eq!(spaceship1.fuel, 12);
+
+        assert_eq!(spaceship2.shield, true);
+        assert_eq!(spaceship2.name, "The Anubis");
+        assert_eq!(spaceship2.fuel, 12);
+    }
+    //
+    // ## Composite Structs
+    //
+    // A struct may be made up of other structs
+    //
+    struct SpacePort {
+        name : String,
+        docked_spaceship: Spaceship,
+    }
+    // We can refer to the nested components using the dot notation.
+    #[test]
+    fn test_struct_composite_struct() {   
+        let space_port = SpacePort {
+            name : String::from("Lovell City"),
+            docked_spaceship : Spaceship {
+                shield: true,
+                name: String::from("Rocinante"),
+                fuel : 12
+            }
+        };
+        assert_eq!(space_port.name, "Lovell City");
+        assert_eq!(space_port.docked_spaceship.name, "Rocinante");
+    } 
+    //
+    // ## Tuple Struct 
+    //
+    // In a tuple struct, components are positional rather than
+    // having a name. 
+    //
+    #[derive(PartialEq)]
+    #[derive(Debug)]
+    struct RGB(u8,u8,u8); /* Declaration */
+    #[test]
+    fn test_tuple_struct() {
+        let purple = RGB(255,0,255); /* Construction */
+        assert_eq!(purple.0, 255);   /* Component 0 Query */
+        assert_eq!(purple.1, 0);     /* Component 1 Query */
+        assert_eq!(purple.2, 255);   /* Component 2 Query */
+        assert_eq!(purple, RGB(255,0,255)); /* via PartialEq and Debug */
+    }
+    //
+    // ## Unit-Like Struct
+    //
+    // This struct has no components.
+    //
+    #[derive(PartialEq)]
+    #[derive(Debug)]
+    struct NoComponents;
+    #[test]
+    fn test_unit_struct() {
+        let no_components = NoComponents;
+        assert_eq!(no_components, NoComponents);
     }
 }
