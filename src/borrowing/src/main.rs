@@ -1,10 +1,14 @@
 fn main() {
 }
-//
-// ## Borrowing
-//
 #[cfg(test)]
 mod tests {
+    //
+    // ## Borrowing
+    //
+    // Borrowing is the process used by the Rust compiler to
+    // avoid race conditions and detect when it is safe to
+    // dispose of allocated memory without the need for
+    // explicit allocation nor deallocation.
     //
     // ### Variable Move
     //
